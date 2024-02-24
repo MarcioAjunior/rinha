@@ -11,6 +11,7 @@ Para instalar e configurar esta API, siga estas etapas:
 1. Clone este repositório para o seu ambiente.
 2. Navegue até o diretório do projeto.
 3. Crie uma virtual env com o comando:
+
    -Windows
    ```
     python -m venv <nome-virtualenv>
@@ -20,6 +21,7 @@ Para instalar e configurar esta API, siga estas etapas:
     virtualenv <nome-virtualenv>
    ```
 4. Ative sua virtualenv
+
    -Windows
    ```
     ./<nome-virtualenv>/Scripts/activate
