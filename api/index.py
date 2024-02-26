@@ -28,4 +28,4 @@ if __name__ == '__main__':
         db_password=os.environ.get('PASS'),
         db_user=os.environ.get('USER')
         )
-    run(host= os.environ.get('HOST'), port=os.environ.get('PORT_HTTP'), debug=True)
+    run(host= "0.0.0.0", port=80, debug=True) #os.environ.get('HOST') os.environ.get('PORT_HTTP')
