@@ -1,24 +1,24 @@
 version: '3'
 
 services:
-  # db:
-  #   image: postgres
-  #   restart: unless-stopped
-  #   environment:
-  #     POSTGRES_DB: mydatabase
-  #     POSTGRES_USER: myuser
-  #     POSTGRES_PASSWORD: mypassword
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - db-data:/var/lib/postgresql/data
-  #   networks:
-  #     - bridge_network
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - bridge_network
 
   api:
     image: rinha_api:latest 
     ports:
-      - "80:5000"
+      - "80:80"
     networks:
       - bridge_network
 
