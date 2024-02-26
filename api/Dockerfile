@@ -1,20 +1,20 @@
-FROM python:3.10.13-slim
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY . /app
 
 RUN apt-get update \
     && apt-get -y install libpq-dev gcc \
     && pip install psycopg2
 
-COPY . .
+ENV DBHOST = ''
+ENV DBNAME = ''
+ENV DBPASS = ''
+ENV DBUSER = ''
 
-ENV DBHOST=127.0.0.1
-ENV DBNAME=DB
-ENV PASS=PASS
-ENV USER=USER
 
-ENV HOST=127.0.0.1
-ENV PORT_HTTP=8080
-
-EXPOSE 8080
+EXPOSE 80
 
 RUN pip install -r requirements.txt
 
