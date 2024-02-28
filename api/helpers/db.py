@@ -29,8 +29,6 @@ class Db():
             return self._intance.conn
         except Exception as error:
             raise Exception(f'NÃO FOI POSSÍVEL ESTABELECER CONEXÃO COM O BANCO ! - {error}')
-        
-    
     def query(self, type_query = 'S', **kwargs):
         with self.connect().cursor() as cur:
             try:
