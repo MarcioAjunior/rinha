@@ -2,6 +2,10 @@ import psycopg2
 
 class Db():
     _intance = None
+    C = "INSERT INTO %s (%s) VALUES(%s)"
+    R = "SELECT %s FROM %s WHERE %s"
+    U = "UPDATE %s SET %s WHERE %s"
+    D = "DELETE FROM %s WHERE %s"
       
     def __new__(cls, db_name, db_user, db_password, db_host):
         if cls._intance is None:
@@ -27,17 +31,20 @@ class Db():
             raise Exception(f'NÃO FOI POSSÍVEL ESTABELECER CONEXÃO COM O BANCO ! - {error}')
         
     
-    def query(self, sql = 'SELECT version()', fetchall = False):
+    def query(self, type_query = 'S', **kwargs):
         with self.connect().cursor() as cur:
             try:
-                cur.execute(sql)
-                if fetchall:
-                    rows = cur.fetchall()
-                    self._intance.conn.close()
-                    return rows
-                row = cur.fetchone()
-                self._intance.conn.close()
-                return row
+                match type_query:
+                    case 'C':
+                        pass
+                    case 'R':
+                        return cur.execute(self.R,(kwargs.get('campos'), kwargs.get('tabela'), kwargs.get('condicao') ))
+                    case 'U':
+                        pass
+                    case 'D':
+                        pass
+
+                
             except (Exception, psycopg2.DatabaseError) as error:
                 print(f'ERRO AO EXECUTAR A QUERY {error}')
             

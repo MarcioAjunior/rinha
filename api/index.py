@@ -1,4 +1,4 @@
-from bottle import run, get, post, error
+from bottle import run, get, post, error, request
 from helpers.db import Db
 import os
 from dotenv import load_dotenv
@@ -6,7 +6,14 @@ from dotenv import load_dotenv
 @post('/clientes/<id:int>/transacoes')
 def post_operation(id:int = None):
     """Rota que cadastra uma operação para o id do cliente indicado como parâmetro"""
-    return None
+    required = set(('valor','tipo','descricao')) 
+    body = request.json
+    if not set(body.keys()) == required:
+        return 'Erro'
+    
+    result = db.query(type_query='R', kwargs={"campos":"limite, saldo_inicial", "tabela":"clientes", "condicao":f"id = {id}" })
+    print(result)
+    return 
 
 @get('/clientes/<id:int>/extrato')
 def get_extract(id:int = None):
@@ -23,9 +30,9 @@ def error404(error):
 if __name__ == '__main__':
     load_dotenv()
     db = Db(
-        db_host= os.environ.get('HOST'),
-        db_name=os.environ.get('DBNAME'),
-        db_password=os.environ.get('PASS'),
-        db_user=os.environ.get('USER')
+        db_host= 'localhost',
+        db_name='rinha',
+        db_password='mypassword',
+        db_user='myuser'
         )
-    run(host= "0.0.0.0", port=80, debug=True) #os.environ.get('HOST') os.environ.get('PORT_HTTP')
+    run(host= '127.0.0.1', port=80, debug=True, reloader=True) #os.environ.get('HOST') os.environ.get('PORT_HTTP')
