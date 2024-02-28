@@ -5,13 +5,14 @@ services:
     image: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: mydatabase
+      POSTGRES_DB: rinha
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
     ports:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d 
     networks:
       - bridge_network
 
