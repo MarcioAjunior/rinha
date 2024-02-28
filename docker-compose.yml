@@ -16,21 +16,21 @@ services:
     networks:
       - bridge_network
 
-  api:
-    image: rinha_api:latest 
-    ports:
-      - "80:80"
-    networks:
-      - bridge_network
+  # api:
+  #   image: rinha_api:latest 
+  #   ports:
+  #     - "80:80"
+  #   networks:
+  #     - bridge_network
 
-  tester:
-    image: debian:latest
-    command: ["/bin/bash", "-c", "apt-get update && apt-get install -y wget && apt-get install -y iputils-ping && apt-get install -y curl && apt-get install -y nmap && apt-get clean && exec bash"]
-    stdin_open: true
-    tty: true
-    restart: unless-stopped
-    networks:
-      - bridge_network
+  # tester:
+  #   image: debian:latest
+  #   command: ["/bin/bash", "-c", "apt-get update && apt-get install -y wget && apt-get install -y iputils-ping && apt-get install -y curl && apt-get install -y nmap && apt-get clean && exec bash"]
+  #   stdin_open: true
+  #   tty: true
+  #   restart: unless-stopped
+  #   networks:
+  #     - bridge_network
 
 networks:
   bridge_network:
