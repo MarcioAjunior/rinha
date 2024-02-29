@@ -30,16 +30,20 @@ def post_operation(id:int = None):
             return response
         
         user["saldo_inicial"] -= body.get('valor')
-        print(user.get('saldo_inicial'))
-        db.query(type_query='U', args={"tabela": 'clientes', "set": f'saldo_inicial = {user.get("saldo_inicial")}', "condicao": f'id = {user.get("id")}'})
-        db.query(type_query='C', args={"tabela": 'transacoes_cliente', "colunas": 'cliente_id, transacao_id, valor', "values": f'{user.get("id")}, {2}, {body.get("valor")}'})
+        success = db.query(type_query='U', args={"tabela": 'clientes', "set": f'saldo_inicial = {user.get("saldo_inicial")}', "condicao": f'id = {user.get("id")}'})
+        if success:
+            success =db.query(type_query='C', args={"tabela": 'transacoes_cliente', "colunas": 'cliente_id, transacao_id, valor, descricao', "values": f'{user.get("id")}, {2}, {body.get("valor")}, \'{body.get("descricao")}\''})
+            if success:
+                user.pop("id")
+                return user
     else:
         user["saldo_inicial"] += body.get('valor')
-        print(user.get('saldo_inicial'))
-        db.query(type_query='U', args={"tabela": 'clientes', "set": f'saldo_inicial = {user.get("saldo_inicial")}', "condicao": f'id = {user.get("id")}'})
-        db.query(type_query='C', args={"tabela": 'transacoes_cliente', "colunas": 'cliente_id, transacao_id, valor', "values": f'{user.get("id")}, {1},  {body.get("valor")}'})
-
-    return user
+        success = db.query(type_query='U', args={"tabela": 'clientes', "set": f'saldo_inicial = {user.get("saldo_inicial")}', "condicao": f'id = {user.get("id")}'})
+        if success:
+            success = db.query(type_query='C', args={"tabela": 'transacoes_cliente', "colunas": 'cliente_id, transacao_id, valor, descricao', "values": f'{user.get("id")}, {2}, {body.get("valor")}, \'{body.get("descricao")}\'' })
+            if success:     
+                user.pop("id")
+                return user
 
 @get('/clientes/<id:int>/extrato')
 def get_extract(id:int = None):

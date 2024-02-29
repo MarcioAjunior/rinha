@@ -46,9 +46,12 @@ class Db():
                         sql = self.U % (args.get('tabela'), args.get('set'), args.get('condicao'))
                         cur.execute(sql)     
                     case 'D':
-                        pass
+                        pass 
                 self._intance.conn.commit()
-                cur.close()                        
+                return True                         
             except (Exception, psycopg2.DatabaseError) as error:
                 print(f'ERRO AO EXECUTAR A QUERY {error}')
+                return False  
+            finally:
+                cur.close()
             

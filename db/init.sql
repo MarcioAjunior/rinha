@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS transacoes_cliente (
     cliente_id INT REFERENCES clientes(id),
     transacao_id INT REFERENCES transacoes(id),
     data_operacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    valor INT NOT NULL
+    valor INT NOT NULL,
+    descricao TEXT NULL
 );
 
 
