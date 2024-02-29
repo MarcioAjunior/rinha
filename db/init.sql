@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS clientes (
     id SERIAL PRIMARY KEY,
-    limite NUMERIC(10, 2) NOT NULL,
-    saldo_inicial NUMERIC(10, 2) NOT NULL DEFAULT 0,
+    limite INT NOT NULL,
+    saldo_inicial INT NOT NULL DEFAULT 0,
     nome TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS transacoes (
-    id SERIAL PRIMARY KEY,
+    id INT NOT NULL PRIMARY KEY,
     transacao TEXT NOT NULL,
     abreviation CHAR(1) NULL
 );
@@ -15,12 +15,13 @@ CREATE TABLE IF NOT EXISTS transacoes_cliente (
     id SERIAL PRIMARY KEY,
     cliente_id INT REFERENCES clientes(id),
     transacao_id INT REFERENCES transacoes(id),
-    data_operacao TIMESTAMP DEFAULT now()
+    data_operacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    valor INT NOT NULL
 );
 
 
-INSERT INTO transacoes (transacao, abreviation) VALUES ('Crédito', 'c');
-INSERT INTO transacoes (transacao, abreviation) VALUES ('Débito',  'd');
+INSERT INTO transacoes (id, transacao, abreviation) VALUES (1, 'Crédito', 'c');
+INSERT INTO transacoes (id, transacao, abreviation) VALUES (2, 'Débito',  'd');
 
 DO $$
 BEGIN

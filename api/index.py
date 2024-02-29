@@ -1,7 +1,8 @@
-from bottle import run, get, post, error, request
+from bottle import run, get, post, error, request, BaseResponse, response
 from helpers.db import Db
-import os
+import os, json
 from dotenv import load_dotenv
+
 
 @post('/clientes/<id:int>/transacoes')
 def post_operation(id:int = None):
@@ -9,11 +10,36 @@ def post_operation(id:int = None):
     required = set(('valor','tipo','descricao')) 
     body = request.json
     if not set(body.keys()) == required:
-        return 'Erro'
+        response.status = 422
+        response.body = 'Requisição imcompleta !'
+        return response
     
-    result = db.query(type_query='R', kwargs={"campos":"limite, saldo_inicial", "tabela":"clientes", "condicao":f"id = {id}" })
-    print(result)
-    return 
+    user = db.query(type_query='R', args={"campos":'id, limite, saldo_inicial', "tabela":'clientes', "condicao":f'id = {id}' })
+
+    if user is None:
+        response.status = 404
+        response.body = 'Usuario Não encontrado !'
+        return response
+    
+    user = dict(zip(('id','limite','saldo_inicial'),user))
+    
+    if body.get('tipo') == 'd':
+        if user.get('saldo_inicial') - body.get('valor') < user.get('limite') * -1:
+            response.status = 422
+            response.body = 'Operaçõe inconsiste com limite desse usuario !'
+            return response
+        
+        user["saldo_inicial"] -= body.get('valor')
+        print(user.get('saldo_inicial'))
+        db.query(type_query='U', args={"tabela": 'clientes', "set": f'saldo_inicial = {user.get("saldo_inicial")}', "condicao": f'id = {user.get("id")}'})
+        db.query(type_query='C', args={"tabela": 'transacoes_cliente', "colunas": 'cliente_id, transacao_id, valor', "values": f'{user.get("id")}, {2}, {body.get("valor")}'})
+    else:
+        user["saldo_inicial"] += body.get('valor')
+        print(user.get('saldo_inicial'))
+        db.query(type_query='U', args={"tabela": 'clientes', "set": f'saldo_inicial = {user.get("saldo_inicial")}', "condicao": f'id = {user.get("id")}'})
+        db.query(type_query='C', args={"tabela": 'transacoes_cliente', "colunas": 'cliente_id, transacao_id, valor', "values": f'{user.get("id")}, {1},  {body.get("valor")}'})
+
+    return user
 
 @get('/clientes/<id:int>/extrato')
 def get_extract(id:int = None):
