@@ -14,7 +14,7 @@ Está api será buildade para uma imagem docker, porém é possível roda-la sep
 - [ ] Configurar .env(s).
 - [ ] Buildar imagem da API.
 - [ ] Configurar docker compose para banco e api.
-- [ ] Definir nginx para load balancer.
+- [ ] Definir nginx para load balancer (round robin).
 - [ ] Ajustar portas conforme solicitado.
 - [ ] Distribuir recursos entre os containers (Memória e espaço).
 - [ ] Realizar teste com Gatling.
