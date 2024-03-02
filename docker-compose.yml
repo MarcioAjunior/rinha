@@ -13,22 +13,22 @@ services:
     volumes:
       # - db-data:/var/lib/postgresql/data
       - ./db:/docker-entrypoint-initdb.d
-    deploy:
-      resources:
-        limits:
-          cpus: "0.13"
-          memory: "140MB"
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: "0.13"
+    #       memory: "140MB"
 
   api01: &api
     image: marcioluzjr/rinha_api:v1
     hostname: api01 
     ports:
       - "8081:8080"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.6"
-          memory: "200MB"
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: "0.6"
+    #       memory: "200MB"
 
   api02:
     <<: *api 
@@ -45,11 +45,11 @@ services:
       - api02
     ports:
       - "9999:9999" 
-    deploy:
-      resources:
-        limits:
-          cpus: "0.17"
-          memory: "10MB"
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: "0.17"
+    #       memory: "10MB"
 
 networks:
   default:
