@@ -25,7 +25,7 @@ class Db():
             user = self._intance.db_user,
             password = self._intance.db_password,
             host = self._intance.db_host,
-            port = 2000
+            port = 5432
         )
             return self._intance.conn
         except Exception as error:
