@@ -4,6 +4,7 @@ class Db():
     _intance = None
     C = 'INSERT INTO %s (%s) VALUES(%s);'
     R = 'SELECT %s FROM %s WHERE %s;'
+    RL = 'SELECT %s FROM %s WHERE %s ORDER BY data_operacao DESC;'
     U = 'UPDATE %s SET %s WHERE %s;'
     D = 'DELETE FROM %s WHERE %s;'
       
@@ -42,6 +43,10 @@ class Db():
                         sql = self.R % (args.get('campos'), args.get('tabela'),args.get('condicao'))
                         cur.execute(sql)
                         return cur.fetchone()
+                    case 'RL':
+                        sql = self.RL % (args.get('campos'), args.get('tabela'),args.get('condicao'))
+                        cur.execute(sql)
+                        return cur.fetchmany(10)
                     case 'U':
                         sql = self.U % (args.get('tabela'), args.get('set'), args.get('condicao'))
                         cur.execute(sql)     

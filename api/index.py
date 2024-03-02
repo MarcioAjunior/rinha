@@ -2,7 +2,7 @@ from bottle import run, get, post, error, request, BaseResponse, response
 from helpers.db import Db
 import os, json
 from dotenv import load_dotenv
-
+import datetime
 
 @post('/clientes/<id:int>/transacoes')
 def post_operation(id:int = None):
@@ -49,8 +49,33 @@ def post_operation(id:int = None):
 def get_extract(id:int = None):
     """Rota que retorna o extrato do cliente indicado como parâmetro"""
     
-    return str(db.conn.closed)
+    user = db.query(type_query='R', args={"campos":'id, limite, saldo_inicial', "tabela":'clientes', "condicao":f'id = {id}' })
+    
+    if user is None:
+        response.status = 404
+        response.body = 'Usuario Não encontrado !'
+        return response
+    
+    user = dict(zip(('id','limite','saldo_inicial'),user))
+    
+    data_formatada = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    
+    saldo = dict(zip(('total','data_extrato', 'limite'),(user.get("saldo_inicial"), data_formatada ,user.get("limite"))))
 
+    #transacao_id
+    user_trasacoes = db.query(type_query='RL', args={"campos":'valor, transacao_id, descricao, data_operacao', "tabela":'transacoes_cliente', "condicao":f' cliente_id = {id}' })
+
+    print(user_trasacoes)
+
+    ultimas_transacoes = []
+    for valor, trasacao_id, descricao, data_operacao in user_trasacoes:
+        tipo = 'c' if trasacao_id == 1 else 'd'       
+        data_operacao = data_operacao.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        ultimas_transacoes.append(dict(zip(('valor', 'tipo', 'descricao', 'realizada_em'),(valor, tipo, descricao, data_operacao))))
+
+    result = dict(zip(('saldo','ultimas_transacoes'),(saldo, ultimas_transacoes)))
+    return result
+ 
 @error(404)
 def error404(error):
     print(error)
@@ -65,3 +90,4 @@ if __name__ == '__main__':
         db_user='myuser'
         )
     run(host= '127.0.0.1', port=80, debug=True, reloader=True) #os.environ.get('HOST') os.environ.get('PORT_HTTP')
+
