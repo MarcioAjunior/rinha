@@ -65,8 +65,6 @@ def get_extract(id:int = None):
     #transacao_id
     user_trasacoes = db.query(type_query='RL', args={"campos":'valor, transacao_id, descricao, data_operacao', "tabela":'transacoes_cliente', "condicao":f' cliente_id = {id}' })
 
-    print(user_trasacoes)
-
     ultimas_transacoes = []
     for valor, trasacao_id, descricao, data_operacao in user_trasacoes:
         tipo = 'c' if trasacao_id == 1 else 'd'       
