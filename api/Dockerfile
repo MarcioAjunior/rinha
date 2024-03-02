@@ -8,14 +8,11 @@ RUN apt-get update \
     && apt-get -y install libpq-dev gcc \
     && pip install psycopg2
 
-ENV DBHOST = ''
-ENV DBNAME = ''
-ENV DBPASS = ''
-ENV DBUSER = ''
-
-
 EXPOSE 8080
 
 RUN pip install -r requirements.txt
 
 CMD ["python", "./index.py"]
+
+
+

@@ -11,7 +11,7 @@ services:
     ports:
       - "2000:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      # - db-data:/var/lib/postgresql/data
       - ./db:/docker-entrypoint-initdb.d
     deploy:
       resources:
@@ -20,7 +20,7 @@ services:
           memory: "140MB"
 
   api01: &api
-    image: rinha-local:latest
+    image: marcioluzjr/rinha_api:v1
     hostname: api01 
     ports:
       - "8081:8080"

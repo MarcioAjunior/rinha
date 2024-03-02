@@ -62,7 +62,6 @@ def get_extract(id:int = None):
     
     saldo = dict(zip(('total','data_extrato', 'limite'),(user.get("saldo_inicial"), data_formatada ,user.get("limite"))))
 
-    #transacao_id
     user_trasacoes = db.query(type_query='RL', args={"campos":'valor, transacao_id, descricao, data_operacao', "tabela":'transacoes_cliente', "condicao":f' cliente_id = {id}' })
 
     ultimas_transacoes = []
