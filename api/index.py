@@ -48,8 +48,7 @@ def post_operation(id:int = None):
 @get('/clientes/<id:int>/extrato')
 def get_extract(id:int = None):
     """Rota que retorna o extrato do cliente indicado como parâmetro"""
-    aa = db.query()
-    print(f'AAAA {db.conn.closed}')
+    
     return str(db.conn.closed)
 
 @error(404)
