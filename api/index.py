@@ -82,10 +82,9 @@ def error404(error):
 if __name__ == '__main__':
     load_dotenv()
     db = Db(
-        db_host= 'localhost',
+        db_host= 'db',
         db_name='rinha',
         db_password='mypassword',
         db_user='myuser'
         )
-    run(host= '127.0.0.1', port=80, debug=True, reloader=True) #os.environ.get('HOST') os.environ.get('PORT_HTTP')
-
+    run(host= '0.0.0.0', port=8080, debug=True, reloader=True) #os.environ.get('HOST') os.environ.get('PORT_HTTP')
