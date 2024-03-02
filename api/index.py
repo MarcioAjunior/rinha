@@ -62,15 +62,20 @@ def get_extract(id:int = None):
     
     saldo = dict(zip(('total','data_extrato', 'limite'),(user.get("saldo_inicial"), data_formatada ,user.get("limite"))))
 
-    user_trasacoes = db.query(type_query='R', args={"campos":'cliente_id, transacao_id, data_operacao, valor, descricao', "tabela":'transacoes_cliente', "condicao":f' cliente_id = {id}' })
+    #transacao_id
+    user_trasacoes = db.query(type_query='RL', args={"campos":'valor, transacao_id, descricao, data_operacao', "tabela":'transacoes_cliente', "condicao":f' cliente_id = {id}' })
 
     print(user_trasacoes)
 
-    return None
-    
+    ultimas_transacoes = []
+    for valor, trasacao_id, descricao, data_operacao in user_trasacoes:
+        tipo = 'c' if trasacao_id == 1 else 'd'       
+        data_operacao = data_operacao.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        ultimas_transacoes.append(dict(zip(('valor', 'tipo', 'descricao', 'realizada_em'),(valor, tipo, descricao, data_operacao))))
 
-    
-
+    result = dict(zip(('saldo','ultimas_transacoes'),(saldo, ultimas_transacoes)))
+    return result
+ 
 @error(404)
 def error404(error):
     print(error)
@@ -79,10 +84,10 @@ def error404(error):
 if __name__ == '__main__':
     load_dotenv()
     db = Db(
-        db_host= 'db',
+        db_host= 'localhost',
         db_name='rinha',
         db_password='mypassword',
         db_user='myuser'
         )
-    run(host= '0.0.0.0', port=8080, debug=True, reloader=True) #os.environ.get('HOST') os.environ.get('PORT_HTTP')
+    run(host= '127.0.0.1', port=80, debug=True, reloader=True) #os.environ.get('HOST') os.environ.get('PORT_HTTP')
 

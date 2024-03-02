@@ -4,6 +4,7 @@ class Db():
     _intance = None
     C = 'INSERT INTO %s (%s) VALUES(%s);'
     R = 'SELECT %s FROM %s WHERE %s;'
+    RL = 'SELECT %s FROM %s WHERE %s ORDER BY data_operacao DESC;'
     U = 'UPDATE %s SET %s WHERE %s;'
     D = 'DELETE FROM %s WHERE %s;'
       
@@ -25,7 +26,7 @@ class Db():
             user = self._intance.db_user,
             password = self._intance.db_password,
             host = self._intance.db_host,
-            #port = 2000
+            port = 2000
         )
             return self._intance.conn
         except Exception as error:
@@ -40,9 +41,12 @@ class Db():
                         cur.execute(sql)
                     case 'R':
                         sql = self.R % (args.get('campos'), args.get('tabela'),args.get('condicao'))
-                        
                         cur.execute(sql)
                         return cur.fetchone()
+                    case 'RL':
+                        sql = self.RL % (args.get('campos'), args.get('tabela'),args.get('condicao'))
+                        cur.execute(sql)
+                        return cur.fetchmany(10)
                     case 'U':
                         sql = self.U % (args.get('tabela'), args.get('set'), args.get('condicao'))
                         cur.execute(sql)     

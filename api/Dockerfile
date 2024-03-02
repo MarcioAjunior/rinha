@@ -14,7 +14,7 @@ ENV DBPASS = ''
 ENV DBUSER = ''
 
 
-EXPOSE 8080
+EXPOSE 80
 
 RUN pip install -r requirements.txt
 
