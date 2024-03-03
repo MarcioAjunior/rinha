@@ -12,7 +12,7 @@ EXPOSE 8080
 
 RUN pip install -r requirements.txt
 
-CMD ["python", "./index.py"]
+CMD ["python", "./main.py"]
 
 
 
