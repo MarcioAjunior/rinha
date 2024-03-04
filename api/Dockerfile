@@ -10,6 +10,9 @@ RUN apt-get update \
 
 EXPOSE 8080
 
+ENV PORT=5432
+ENV HOST='db'
+
 RUN pip install -r requirements.txt
 
 CMD ["python", "./main.py"]

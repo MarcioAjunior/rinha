@@ -1,4 +1,6 @@
 import psycopg2
+import os
+from dotenv import load_dotenv
 
 class Database:
     _instance = None
@@ -6,12 +8,13 @@ class Database:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
+            load_dotenv()
             cls._instance.conn = psycopg2.connect(
                 dbname='rinha',
                 user='myuser',
                 password='mypassword',
-                host='db',
-                port=5432
+                host=os.getenv('HOST'),
+                port = os.getenv('PORT')
             )
         return cls._instance
 
