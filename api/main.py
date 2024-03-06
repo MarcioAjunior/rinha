@@ -40,6 +40,9 @@ def realizar_transacao(id):
     else:
         return HTTPResponse(status=422, body='O Tipo de valor deve ser um inteiro !')          
     
+    if not isinstance(data['descricao'], str):
+        return HTTPResponse(status=422, body='Informe um texto válido como descrição !')
+    
     if len(str(data['descricao'])) > 10 or len(str(data['descricao'])) < 1:
         return HTTPResponse(status=422, body='Informe uma descrição entre 1 e 10 caractéres !')
     
@@ -72,7 +75,7 @@ def obter_extrato(id):
 
 @app.error(404)
 def error404(error):
-    return "Não há nada aqui ! (´。＿。｀) (。﹏。*)"
+    return f"Não há nada aqui ! (´。＿。｀) (。﹏。*), -> {error}"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True, reloader=True)

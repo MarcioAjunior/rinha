@@ -26,13 +26,13 @@ class PDO:
     def get_extrato(self, id):
         cliente = self.get_cliente(id)
         
-        for saldo_cliente, limite_cliente in cliente:
-            saldo = saldo_cliente
-            limite = limite_cliente
-        
         if not cliente:
             return None
         
+        for saldo_cliente, limite_cliente in cliente:
+            saldo = saldo_cliente
+            limite = limite_cliente
+                
         transacoes = self.get_transacoes(id)
 
         extrato = {
