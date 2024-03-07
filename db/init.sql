@@ -5,24 +5,14 @@ CREATE TABLE IF NOT EXISTS clientes (
     nome TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS transacoes (
-    id INT NOT NULL PRIMARY KEY,
-    transacao TEXT NOT NULL,
-    abreviation CHAR(1) NULL
-);
-
 CREATE TABLE IF NOT EXISTS transacoes_cliente (
     id SERIAL PRIMARY KEY,
     cliente_id INT REFERENCES clientes(id),
-    transacao_id INT REFERENCES transacoes(id),
-    data_operacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transacao_tipo TEXT NOT NULL,
+    realizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     valor INT NOT NULL,
     descricao TEXT NULL
 );
-
-
-INSERT INTO transacoes (id, transacao, abreviation) VALUES (1, 'Crédito', 'c');
-INSERT INTO transacoes (id, transacao, abreviation) VALUES (2, 'Débito',  'd');
 
 DO $$
 BEGIN
