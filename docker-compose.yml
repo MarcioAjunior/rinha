@@ -1,9 +1,9 @@
-version: '3'
+version: '3.8'
 
 services:
   db:
     container_name: db
-    image: postgres
+    image: postgres:alpine
     restart: unless-stopped
     networks:
       default:
@@ -13,64 +13,64 @@ services:
       POSTGRES_PASSWORD: mypassword
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/db.sql
-      #- ./postgresql.conf:/docker-entrypoint-initdb.d/postgresql.config_file
-    deploy:
-      resources:
-        limits:
-          cpus: "0.13"
-          memory: "145MB"
-
-  api01: &api
-    container_name: api01
-    image: marcioluzjr/rinha_api:v13
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_started
-    networks:
-      default: 
+      - ./postgresql.conf:/docker-entrypoint-initdb.d/postgresql.config
+    command: postgres -c config_file=/docker-entrypoint-initdb.d/postgresql.config
     deploy:
       resources:
         limits:
           cpus: "0.5"
-          memory: "160MB"
+          memory: "450MB"
 
-  api02:
-    <<: *api
-    container_name: api02
-    networks:
-      default: 
+#   api01: &api
+#     container_name: api01
+#     image: marcioluzjr/rinha_api:v1
+#     restart: unless-stopped
+#     networks:
+#       default:
+#     depends_on:
+#       - db  # Wait for db service to be ready 
+#     deploy:
+#       resources:
+#         limits:
+#           cpus: "0.55"
+#           memory: "25MB"
 
-  nginx:
-    container_name: nginx
-    image: nginx:latest
-    restart: unless-stopped
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      api01:
-        condition: service_started
-      api02:
-        condition: service_started
-    ports:
-      - "9999:9999"
-    networks:
-      default: 
-    deploy:
-      resources:
-        limits:
-          cpus: "0.37"
-          memory: "85MB"
+#   api02:
+#     <<: *api
+#     container_name: api02
+#     networks:
+#       default:
+#     depends_on:
+#       - db  # Wait for db service to be ready 
 
-  # tester:
-  #   image: debian:latest
-  #   command: ["/bin/bash", "-c", "apt-get update && apt-get install -y wget && apt-get install -y iputils-ping && apt-get install -y curl && apt-get install -y nmap && apt-get clean && exec bash"]
-  #   networks:
-  #     default: 
-  #   stdin_open: true
-  #   tty: true
-  #   restart: unless-stopped
+#   nginx:
+#     container_name: nginx
+#     image: nginx:latest
+#     restart: unless-stopped
+#     volumes:
+#       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+#     ports:
+#       - "9999:9999"
+#     networks:
+#       default:
+#     depends_on:
+#       - api01  # Wait for api01 to be ready
+#       - api02  # Wait for api02 to be ready
+#     deploy:
+#       resources:
+#         limits:
+#           cpus: "0.4"
+#           memory: "50MB"
 
-networks:
-  default:
-    driver: bridge
+#   # tester:
+#   #   image: debian:latest
+#   #   command: ["/bin/bash", "-c", "apt-get update && apt-get install -y wget && apt-get install -y iputils-ping && apt-get install -y curl && apt-get install -y nmap && apt-get clean && exec bash"]
+#   #   networks:
+#   #     default: 
+#   #   stdin_open: true
+#   #   tty: true
+#   #   restart: unless-stopped
+
+# networks:
+#   default:
+#     driver: bridge

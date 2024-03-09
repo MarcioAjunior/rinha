@@ -1,5 +1,6 @@
 import psycopg2
 import os
+import time
 from dotenv import load_dotenv
 
 class Database:
@@ -9,6 +10,7 @@ class Database:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             load_dotenv()
+            time.sleep(7)
             cls._instance.conn = psycopg2.connect(
                 dbname='rinha',
                 user='myuser',
