@@ -14,7 +14,7 @@ def realizar_transacao(id):
 
     try:
         data = request.json
-    except Exception as error:
+    except:
         return HTTPResponse(status=422, body='Corpo da requisição inválido!')
 
     valid, error_message = validate_transaction_data(data)
@@ -39,16 +39,18 @@ def realizar_transacao(id):
 def validate_transaction_data(data):
     if not isinstance(data, dict) or 'valor' not in data or 'tipo' not in data or 'descricao' not in data:
         return False, "Requisição incompleta!"
+    
     valor = data.get('valor')
     tipo = data.get('tipo')
     descricao = data.get('descricao')
-    if not isinstance(valor, (int, float)) or not isinstance(descricao, str) or tipo not in ('c', 'd'):
-        return False, "Dados inválidos na requisição!"
-    if '.' in str(valor) or valor < 0:
+
+    if not isinstance(valor, (int, float)) or valor < 0 or '.' in str(valor):
         return False, "Informe um valor inteiro positivo!"
-    if len(descricao) < 1 or len(descricao) > 10:
-        return False, "A descrição deve ter entre 1 e 10 caracteres!"
-    return True, ""
+
+    if tipo not in ('c', 'd') or not isinstance(descricao, str) or len(descricao) < 1 or len(descricao) > 10:
+        return False, "Dados inválidos na requisição!"
+
+    return True
 
 @app.get('/clientes/<id:int>/extrato')
 def obter_extrato(id):
