@@ -17,7 +17,7 @@ class PDO:
     def insert_transacao(self, cliente_id, valor, tipo, descricao):
         query = "INSERT INTO transacoes_cliente (cliente_id, transacao_tipo, realizado_em, valor, descricao) VALUES (%s, %s, %s, %s, %s)"
         data = (cliente_id, tipo, datetime.now(), valor, descricao)
-        self.db.execute_query_commited(query, data)
+        self.db.execute_query_commited(query, data, operation = 'insert')
 
     def update_saldo(self, cliente_id, novo_saldo):
         query = "UPDATE clientes SET saldo_inicial = %s WHERE id = %s"

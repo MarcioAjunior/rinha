@@ -26,11 +26,12 @@ class Database:
             self._cursor = self.conn.cursor()
         return self._cursor
 
-    def execute_query_commited(self, query, params=None):
+    def execute_query_commited(self, query, params=None, operation=''):
         cursor = self._get_cursor()
         try:
             cursor.execute(query, params)
-            self.conn.commit()
+            if operation == 'insert':
+                self.conn.commit()
             result = True
         except Exception as e:
             print(f"Erro ao executar a consulta: {e}")
