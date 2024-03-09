@@ -24,31 +24,32 @@ class PDO:
         self.db.execute_query(query, (novo_saldo, cliente_id), operation = 'update')
 
     def get_extrato(self, id):
-        query = f"SELECT c.saldo_inicial, c.limite, tc.valor,tc.transacao_tipo,descricao,realizado_em FROM clientes c inner join transacoes_cliente tc on tc.cliente_id = {id} order by tc.realizado_em desc limit 10"
-        results = self.db.execute_query(query, (id,))
+        cliente = self.get_cliente(id)
         
-        if not results:
+        if not cliente:
             return None
         
-        saldo = {}
-        ultimas_transacoes = []
-        
-        for saldo_inicial, limite, valor, transacao_tipo, descricao, realizado_em in results:
-            saldo = {
-                "total": saldo_inicial,
+        for saldo_cliente, limite_cliente in cliente:
+            saldo = saldo_cliente
+            limite = limite_cliente
+                
+        transacoes = self.get_transacoes(id)
+
+        extrato = {
+            "saldo": {
+                "total": saldo,
                 "data_extrato": datetime.now().isoformat(),
                 "limite": limite
-            }
-            ultimas_transacoes.append({
-                "valor": valor,
-                "tipo": transacao_tipo,
-                "descricao": descricao,
-                "realizado_em": realizado_em.isoformat()
-            })
-            
-        objetao = {
-            "saldo": saldo,
-            "ultimas_transacoes": ultimas_transacoes
+            },
+            "ultimas_transacoes": []
         }
 
-        return objetao
+        for valor, tipo, descricao, realizado_em in transacoes:
+            extrato["ultimas_transacoes"].append({
+                "valor": valor,
+                "tipo": tipo,
+                "descricao": descricao,
+                "realizada_em": realizado_em.isoformat()
+            })
+
+        return extrato
