@@ -1,8 +1,6 @@
 from bottle import Bottle, request, HTTPResponse
-from datetime import datetime
 from pdo import PDO
 from db import Database
-import re
 
 app = Bottle()
 db = Database()
@@ -12,59 +10,45 @@ pdo = PDO(db)
 def realizar_transacao(id):
     cliente = pdo.get_cliente(id)
     if not cliente:
-        return HTTPResponse(status=404, body='Cliente não encontrado !')
+        return HTTPResponse(status=404, body='Cliente não encontrado!')
+
     try:
         data = request.json
     except Exception as error:
-        return HTTPResponse(status=422, body='Corpo da requisição invaída')  
-    
-    if 'valor' not in data or 'tipo' not in data or 'descricao' not in data:
-        return HTTPResponse(status=422, body='Requisição incompleta !')
-    
-    if data['tipo'] not in ('c', 'd'):
-        return HTTPResponse(status=422, body='Tipo de transação inválida !')
- 
-    if isinstance(data['valor'], str):
-        if re.match(r'^\d*\.\d+$', data['valor']):
-            return HTTPResponse(status=422, body='Informe um valor inteiro valido !')
-        try :
-            if int(data['valor']) < 0:
-                return HTTPResponse(status=422, body='Informe um valor positivo!')
-        except:
-            return HTTPResponse(status=422, body='Informe um valor valido')
-    elif isinstance(data['valor'], (int, float)):
-        if '.' in str(data['valor']):
-            return HTTPResponse(status=422, body='Informe um valor inteiro valido !')
-        if int(data['valor']) < 0: 
-            return HTTPResponse(status=422, body='Informe um valor positivo!')     
-    else:
-        return HTTPResponse(status=422, body='O Tipo de valor deve ser um inteiro !')          
-    
-    if not isinstance(data['descricao'], str):
-        return HTTPResponse(status=422, body='Informe um texto válido como descrição !')
-    
-    if len(str(data['descricao'])) > 10 or len(str(data['descricao'])) < 1:
-        return HTTPResponse(status=422, body='Informe uma descrição entre 1 e 10 caractéres !')
-    
+        return HTTPResponse(status=422, body='Corpo da requisição inválido!')
+
+    valid, error_message = validate_transaction_data(data)
+    if not valid:
+        return HTTPResponse(status=422, body=error_message)
+
+    saldo, limite = cliente
     valor = int(data['valor'])
-    tipo = str(data['tipo'])
-    descricao = str(data['descricao'])
-    
-    for saldo_cliente, limite_cliente in cliente:
-        saldo = saldo_cliente
-        limite = limite_cliente
-    
-    if tipo == 'd':
-        if int(saldo) - valor < -int(limite):
-            return HTTPResponse(status=422, body='Transação inconsistente para esse usuario (Sem limite) !')
-        novo_saldo = saldo - valor
-    else: # c
-        novo_saldo = saldo + valor
-        
+    tipo = data['tipo']
+    descricao = data['descricao']
+
+    if tipo == 'd' and saldo - valor < -limite:
+        return HTTPResponse(status=422, body='Transação inconsistente para esse usuário (Sem limite)!')
+
+    novo_saldo = saldo - valor if tipo == 'd' else saldo + valor
+
     pdo.update_saldo(id, novo_saldo)
     pdo.insert_transacao(id, valor, tipo, descricao)
-    
-    return HTTPResponse(status=200, body=dict(zip(('limite', 'saldo'),(limite, novo_saldo)))) 
+
+    return HTTPResponse({'limite': limite, 'saldo': novo_saldo})
+
+def validate_transaction_data(data):
+    if not isinstance(data, dict) or 'valor' not in data or 'tipo' not in data or 'descricao' not in data:
+        return False, "Requisição incompleta!"
+    valor = data.get('valor')
+    tipo = data.get('tipo')
+    descricao = data.get('descricao')
+    if not isinstance(valor, (int, float)) or not isinstance(descricao, str) or tipo not in ('c', 'd'):
+        return False, "Dados inválidos na requisição!"
+    if '.' in str(valor) or valor < 0:
+        return False, "Informe um valor inteiro positivo!"
+    if len(descricao) < 1 or len(descricao) > 10:
+        return False, "A descrição deve ter entre 1 e 10 caracteres!"
+    return True, ""
 
 @app.get('/clientes/<id:int>/extrato')
 def obter_extrato(id):
