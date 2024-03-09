@@ -22,7 +22,7 @@ services:
           memory: "145MB"
 
   api01: &api
-    image: marcioluzjr/rinha_api:v9
+    image: marcioluzjr/rinha_api:v11
     restart: unless-stopped
     hostname: api01
     ports:
