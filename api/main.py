@@ -50,7 +50,7 @@ def validate_transaction_data(data):
     if tipo not in ('c', 'd') or not isinstance(descricao, str) or len(descricao) < 1 or len(descricao) > 10:
         return False, "Dados inválidos na requisição!"
 
-    return True
+    return True, ""
 
 @app.get('/clientes/<id:int>/extrato')
 def obter_extrato(id):
