@@ -6,22 +6,22 @@ class PDO:
 
     def get_cliente(self, id):
         query = "SELECT saldo_inicial, limite  FROM clientes WHERE id = %s"
-        result = self.db.execute_query(query, (id,))
+        result = self.db.execute_query_fetch_one(query, (id,))
         return result
 
     def get_transacoes(self, id):
         query = "SELECT valor, transacao_tipo, descricao, realizado_em FROM transacoes_cliente WHERE cliente_id = %s ORDER BY realizado_em DESC LIMIT 10"
-        result = self.db.execute_query(query, (id,))
+        result = self.db.execute_query_fetch_all(query, (id,))
         return result
 
     def insert_transacao(self, cliente_id, valor, tipo, descricao):
         query = "INSERT INTO transacoes_cliente (cliente_id, transacao_tipo, realizado_em, valor, descricao) VALUES (%s, %s, %s, %s, %s)"
         data = (cliente_id, tipo, datetime.now(), valor, descricao)
-        self.db.execute_query(query, data, operation = 'insert')
+        self.db.execute_query_commited(query, data)
 
     def update_saldo(self, cliente_id, novo_saldo):
         query = "UPDATE clientes SET saldo_inicial = %s WHERE id = %s"
-        self.db.execute_query(query, (novo_saldo, cliente_id), operation = 'update')
+        self.db.execute_query_commited(query, (novo_saldo, cliente_id))
 
     def get_extrato(self, id):
         cliente = self.get_cliente(id)
@@ -29,9 +29,7 @@ class PDO:
         if not cliente:
             return None
         
-        for saldo_cliente, limite_cliente in cliente:
-            saldo = saldo_cliente
-            limite = limite_cliente
+        saldo, limite = cliente
                 
         transacoes = self.get_transacoes(id)
 

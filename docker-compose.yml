@@ -8,8 +8,8 @@ services:
       POSTGRES_DB: rinha
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
-      POSTGRES_SHARED_BUFFERS: "100MB"  #Memória/espaço em buffer compartilhada em entre as conexões
-      POSTGRES_WORK_MEM: "10MB"     # Memória utilizada para manipular dados em buffer
+      POSTGRES_SHARED_BUFFERS: "110MB"  #Memória/espaço em buffer compartilhada em entre as conexões
+      POSTGRES_WORK_MEM: "20MB"     # Memória utilizada para manipular dados em buffer
     ports:
       - "2000:5432"
     volumes:
@@ -22,7 +22,7 @@ services:
           memory: "145MB"
 
   api01: &api
-    image: marcioluzjr/rinha_api:v9
+    image: marcioluzjr/rinha_api:v11
     restart: unless-stopped
     hostname: api01
     ports:
