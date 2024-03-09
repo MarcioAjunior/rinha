@@ -2,19 +2,18 @@ version: '3'
 
 services:
   db:
+    container_name: db
     image: postgres
     restart: unless-stopped
+    networks:
+      default:
     environment:
       POSTGRES_DB: rinha
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
-      POSTGRES_SHARED_BUFFERS: "110MB"  #Memória/espaço em buffer compartilhada em entre as conexões
-      POSTGRES_WORK_MEM: "20MB"     # Memória utilizada para manipular dados em buffer
-    ports:
-      - "2000:5432"
     volumes:
-      # - db-data:/var/lib/postgresql/data
-      - ./db:/docker-entrypoint-initdb.d
+      - ./init.sql:/docker-entrypoint-initdb.d/db.sql
+      #- ./postgresql.conf:/docker-entrypoint-initdb.d/postgresql.config_file
     deploy:
       resources:
         limits:
@@ -22,14 +21,14 @@ services:
           memory: "145MB"
 
   api01: &api
-    image: marcioluzjr/rinha_api:v12
+    container_name: api01
+    image: marcioluzjr/rinha_api:v13
     restart: unless-stopped
-    hostname: api01
-    ports:
-      - "8081:8080"
     depends_on:
       db:
-        condition: service_started 
+        condition: service_started
+    networks:
+      default: 
     deploy:
       resources:
         limits:
@@ -37,15 +36,13 @@ services:
           memory: "160MB"
 
   api02:
-    <<: *api 
-    hostname: api02 
-    ports:
-      - "8082:8080"
-    depends_on:
-      db:
-        condition: service_started 
+    <<: *api
+    container_name: api02
+    networks:
+      default: 
 
   nginx:
+    container_name: nginx
     image: nginx:latest
     restart: unless-stopped
     volumes:
@@ -54,18 +51,26 @@ services:
       api01:
         condition: service_started
       api02:
-        condition: service_started 
+        condition: service_started
     ports:
-      - "9999:9999" 
+      - "9999:9999"
+    networks:
+      default: 
     deploy:
       resources:
         limits:
           cpus: "0.37"
           memory: "85MB"
 
+  # tester:
+  #   image: debian:latest
+  #   command: ["/bin/bash", "-c", "apt-get update && apt-get install -y wget && apt-get install -y iputils-ping && apt-get install -y curl && apt-get install -y nmap && apt-get clean && exec bash"]
+  #   networks:
+  #     default: 
+  #   stdin_open: true
+  #   tty: true
+  #   restart: unless-stopped
+
 networks:
   default:
     driver: bridge
-
-volumes:
-  db-data:
