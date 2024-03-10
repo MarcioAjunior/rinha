@@ -10,7 +10,7 @@ class Database:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             load_dotenv()
-            time.sleep(7)
+            #time.sleep(6)
             cls._instance.conn = psycopg2.connect(
                 dbname='rinha',
                 user='myuser',
@@ -22,11 +22,24 @@ class Database:
 
     def __init__(self):
         self._cursor = None
+        self.custumers = []       
 
     def _get_cursor(self):
         if self._cursor is None or self._cursor.closed:
             self._cursor = self.conn.cursor()
         return self._cursor
+
+    def get_custumers(self):
+        cursor = self._get_cursor()
+        try:
+            cursor.execute('SELECT id FROM clientes')
+            result = cursor.fetchall()
+            clientes = []
+            for cliente in result:
+                clientes.append(cliente[0])
+            self.custumers = clientes 
+        except Exception as e:
+            print('Erro ao localizar clientes !!')
 
     def execute_query_commited(self, query, params=None, operation=''):
         cursor = self._get_cursor()

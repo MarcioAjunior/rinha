@@ -5,6 +5,8 @@ class PDO:
         self.db = db
 
     def get_cliente(self, id):
+        if not id in self.db.custumers:
+            return None
         query = "SELECT saldo_inicial, limite  FROM clientes WHERE id = %s"
         result = self.db.execute_query_fetch_one(query, (id,))
         return result

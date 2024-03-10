@@ -4,10 +4,13 @@ from db import Database
 
 app = Bottle()
 db = Database()
+db.get_custumers()
 pdo = PDO(db)
 
 @app.post('/clientes/<id:int>/transacoes')
 def realizar_transacao(id):
+    
+    
     cliente = pdo.get_cliente(id)
     if not cliente:
         return HTTPResponse(status=404, body='Cliente não encontrado!')
