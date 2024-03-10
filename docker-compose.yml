@@ -18,8 +18,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.55"
-          memory: "450MB"
+          cpus: "1.55"
+          memory: "550MB"
 
   api01: &api
     container_name: api01
@@ -32,16 +32,16 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.55"
-          memory: "25MB"
+          cpus: "1.75"
+          memory: "500MB"
 
-  api02:
-    <<: *api
-    container_name: api02
-    networks:
-      default:
-    depends_on:
-      - db  # Wait for db service to be ready 
+  # api02:
+  #   <<: *api
+  #   container_name: api02
+  #   networks:
+  #     default:
+  #   depends_on:
+  #     - db  # Wait for db service to be ready 
 
   nginx:
     container_name: nginx
@@ -55,12 +55,12 @@ services:
       default:
     depends_on:
       - api01  # Wait for api01 to be ready
-      - api02  # Wait for api02 to be ready
+      #- api02  # Wait for api02 to be ready
     deploy:
       resources:
         limits:
-          cpus: "0.35"
-          memory: "50MB"
+          cpus: "1.35"
+          memory: "500MB"
 
 #   # tester:
 #   #   image: debian:latest
