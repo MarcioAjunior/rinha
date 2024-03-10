@@ -1,6 +1,7 @@
 from bottle import Bottle, request, HTTPResponse
 from pdo import PDO
 from db import Database
+from validate_transaction import validate_transaction_data
 
 app = Bottle()
 db = Database()
@@ -9,12 +10,9 @@ pdo = PDO(db)
 
 @app.post('/clientes/<id:int>/transacoes')
 def realizar_transacao(id):
-    
-    
     cliente = pdo.get_cliente(id)
     if not cliente:
         return HTTPResponse(status=404, body='Cliente não encontrado!')
-
     try:
         data = request.json
     except:
@@ -24,36 +22,22 @@ def realizar_transacao(id):
     if not valid:
         return HTTPResponse(status=422, body=error_message)
 
-    saldo, limite = cliente
-    valor = int(data['valor'])
     tipo = data['tipo']
+    valor = data['valor']
     descricao = data['descricao']
-
-    if tipo == 'd' and saldo - valor < -limite:
-        return HTTPResponse(status=422, body='Transação inconsistente para esse usuário (Sem limite)!')
-
-    novo_saldo = saldo - valor if tipo == 'd' else saldo + valor
-
-    pdo.update_saldo(id, novo_saldo)
-    pdo.insert_transacao(id, valor, tipo, descricao)
-
-    return HTTPResponse({'limite': limite, 'saldo': novo_saldo})
-
-def validate_transaction_data(data):
-    if not isinstance(data, dict) or 'valor' not in data or 'tipo' not in data or 'descricao' not in data:
-        return False, "Requisição incompleta!"
     
-    valor = data.get('valor')
-    tipo = data.get('tipo')
-    descricao = data.get('descricao')
-
-    if not isinstance(valor, (int, float)) or valor < 0 or '.' in str(valor):
-        return False, "Informe um valor inteiro positivo!"
-
-    if tipo not in ('c', 'd') or not isinstance(descricao, str) or len(descricao) < 1 or len(descricao) > 10:
-        return False, "Dados inválidos na requisição!"
-
-    return True, ""
+    if tipo == 'c':
+        saldo_inicial, limite, success = pdo.insert_credito(cliente,valor,descricao)
+        if success:
+            return HTTPResponse({'limite': limite, 'saldo': saldo_inicial})
+    else:
+        #d
+        saldo_inicial, limite, success = pdo.insert_debito(cliente,valor,descricao)
+        if success:
+            return HTTPResponse({'limite': limite, 'saldo': saldo_inicial})
+        
+        return HTTPResponse(status=422, body='Operação incosistente para o cliente !')
+        
 
 @app.get('/clientes/<id:int>/extrato')
 def obter_extrato(id):

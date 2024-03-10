@@ -7,23 +7,25 @@ class PDO:
     def get_cliente(self, id):
         if not id in self.db.custumers:
             return None
-        query = "SELECT saldo_inicial, limite  FROM clientes WHERE id = %s"
-        result = self.db.execute_query_fetch_one(query, (id,))
-        return result
+        return id
 
     def get_transacoes(self, id):
         query = "SELECT valor, transacao_tipo, descricao, realizado_em FROM transacoes_cliente WHERE cliente_id = %s ORDER BY realizado_em DESC LIMIT 10"
         result = self.db.execute_query_fetch_all(query, (id,))
         return result
 
-    def insert_transacao(self, cliente_id, valor, tipo, descricao):
-        query = "INSERT INTO transacoes_cliente (cliente_id, transacao_tipo, realizado_em, valor, descricao) VALUES (%s, %s, %s, %s, %s)"
-        data = (cliente_id, tipo, datetime.now(), valor, descricao)
-        self.db.execute_query_commited(query, data, operation = 'insert')
-
-    def update_saldo(self, cliente_id, novo_saldo):
-        query = "UPDATE clientes SET saldo_inicial = %s WHERE id = %s"
-        self.db.execute_query_commited(query, (novo_saldo, cliente_id))
+    def insert_credito(self, id_cliente, valor, descricao):
+        query = "select credito(%s, %s, %s)"
+        results = self.db.execute_query_fetch_one(query, (id_cliente, valor, descricao))
+        results = eval(results[0].replace("t", "True").replace("f", "False")) 
+        return results
+        
+    def insert_debito(self, id_cliente, valor, descricao):
+        query = "select debito(%s, %s, %s)"
+        results = self.db.execute_query_fetch_one(query, (id_cliente, valor, descricao))
+        results = eval(results[0].replace("t", "True").replace("f", "False")) 
+        return results
+    
 
     def get_extrato(self, id):
         cliente = self.get_cliente(id)
